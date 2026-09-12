@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>💎 MM2 Hub — Adil Takas, Akıllı Ticaret</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(circle at top,#1e1b3a 0%,#0f0c29 50%,#05010f 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column;padding:15px}
+header{text-align:center;margin-bottom:25px;padding:15px 0}
+header h1{font-size:2.2rem;background:linear-gradient(90deg,#a855f7,#6366f1,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px}
+.tagline{color:#a5b4fc;margin-top:8px;font-size:1rem;font-style:italic;letter-spacing:1.5px}
+.trade-container{display:grid;grid-template-columns:1fr;gap:20px;max-width:900px;margin:0 auto;width:100%;flex:1}
+@media(min-width:768px) and (max-width:1100px){.trade-container{grid-template-columns:1fr 1fr}.fairness-box{grid-column:1/-1;order:3}}
+@media(min-width:1101px){.trade-container{grid-template-columns:1fr 320px 1fr;max-width:1400px}}
+.offer-box{background:rgba(168,85,247,.08);border:2px solid rgba(168,85,247,.35);border-radius:18px;padding:18px;min-height:350px}
+.offer-box.your{border-color:rgba(34,211,238,.4)}
+.offer-box.their{border-color:rgba(168,85,247,.5)}
+.offer-box h2{text-align:center;margin-bottom:12px;font-size:1.15rem}
+.offer-box.your h2{color:#22d3ee}
+.offer-box.their h2{color:#a855f7}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:9px;margin-bottom:12px;max-height:380px;overflow-y:auto;padding-right:4px}
+.items-grid::-webkit-scrollbar{width:6px}
+.items-grid::-webkit-scrollbar-thumb{background:#6366f1;border-radius:3px}
+.item-btn{background:rgba(255,255,255,.06);border:2px solid transparent;border-radius:12px;padding:10px 4px;cursor:pointer;transition:all .2s;text-align:center;font-size:.7rem;color:#e0e7ff;line-height:1.2;min-height:70px;touch-action:manipulation}
+.item-btn:active{transform:scale(.96)}
+.item-btn.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.35),rgba(99,102,241,.35));box-shadow:0 0 15px rgba(168,85,247,.5)}
+.item-btn .emoji{font-size:1.6rem;display:block;margin-bottom:3px}
+.total{text-align:center;font-size:1.15rem;font-weight:bold;padding-top:10px;border-top:1px solid rgba(168,85,247,.25)}
+.total span{color:#4ade80;text-shadow:0 0 10px rgba(74,222,128,.5)}
+.fairness-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:15px}
+.meter{width:100%;height:28px;background:rgba(0,0,0,.5);border:2px solid rgba(168,85,247,.4);border-radius:20px;overflow:hidden}
+.meter-fill{height:100%;width:50%;background:linear-gradient(90deg,#6366f1,#a855f7);transition:all .5s ease;border-radius:20px}
+#fairnessText{font-size:1.25rem;font-weight:bold;color:#a5b4fc;text-align:center}
+#clearBtn{padding:12px 24px;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#a855f7,#6366f1);box-shadow:0 4px 15px rgba(168,85,247,.4);touch-action:manipulation;min-width:130px}
+#clearBtn:active{transform:scale(.97)}
+footer{text-align:center;margin-top:30px;color:#6b7280;font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+<h1>💎 MM2 Hub</h1>
+<p class="tagline">Adil takas, akıllı ticaret</p>
+</header>
+<main>
+<div class="trade-container">
+<section class="offer-box your">
+<h2>🎁 Sizin Teklifiniz</h2>
+<div class="items-grid" id="yourItems"></div>
+<div class="total">Toplam: <span id="yourTotal">0</span></div>
+</section>
+<section class="fairness-box">
+<div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+<p id="fairnessText">Bekleniyor...</p>
+<button id="clearBtn">🔄 Temizle</button>
+</section>
+<section class="offer-box their">
+<h2>🎯 Onların Teklifi</h2>
+<div class="items-grid" id="theirItems"></div>
+<div class="total">Toplam: <span id="theirTotal">0</span></div>
+</section>
+</div>
+</main>
+<footer><p>© 2026 MM2 Hub — Topluluk tarafından, topluluk için 💜</p></footer>
+
+<script>
+const ITEMS = [
+  {id:'c_darkbringer', name:'Chroma Darkbringer', value:2500, emoji:'🌑'},
+  {id:'c_lightbringer', name:'Chroma Lightbringer', value:2400, emoji:'☀️'},
+  {id:'c_laser', name:'Chroma Laser', value:1400, emoji:'🔫'},
+  {id:'c_gemstone', name:'Chroma Gemstone', value:1100, emoji:'💎'},
+  {id:'c_deathshard', name:'Chroma Deathshard', value:700, emoji:'💀'},
+  {id:'c_fang', name:'Chroma Fang', value:650, emoji:'🦷'},
+  {id:'c_slasher', name:'Chroma Slasher', value:400, emoji:'🔪'},
+  {id:'c_seer', name:'Chroma Seer', value:350, emoji:'🔮'},
+  {id:'c_saw', name:'Chroma Saw', value:300, emoji:'🪚'},
+  {id:'c_gingerbread', name:'Chroma Gingerbread', value:250, emoji:'🍪'},
+  {id:'darkbringer', name:'Darkbringer', value:200, emoji:'🌑'},
+  {id:'lightbringer', name:'Lightbringer', value:180, emoji:'☀️'},
+  {id:'laser', name:'Laser', value:150, emoji:'🔫'},
+  {id:'gemstone', name:'Gemstone', value:140, emoji:'💎'},
+  {id:'deathshard', name:'Deathshard', value:130, emoji:'💀'},
+  {id:'fang', name:'Fang', value:120, emoji:'🦷'},
+  {id:'slasher', name:'Slasher', value:100, emoji:'🔪'},
+  {id:'seer', name:'Seer', value:90, emoji:'🔮'},
+  {id:'saw', name:'Saw', value:80, emoji:'🪚'},
+  {id:'gingerbread', name:'Gingerbread', value:70, emoji:'🍪'},
+  {id:'tides', name:'Tides', value:60, emoji:'🌊'},
+  {id:'heat', name:'Heat', value:55, emoji:'🔥'},
+  {id:'snowflake', name:'Snowflake', value:50, emoji:'❄️'},
+  {id:'skool', name:'Skool', value:45, emoji:'📚'},
+  {id:'nightsky', name:'Night Sky', value:40, emoji:'🌌'}
+];
+
+let yourTrade = [];
+let theirTrade = [];
+
+function calcTotal(trade){
+  return trade.reduce((s,id)=>{
+    const it = ITEMS.find(i=>i.id===id);
+    return s + (it ? it.value : 0);
+  }, 0);
+}
+
+function render(containerId, arr){
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  ITEMS.forEach(it=>{
+    const b = document.createElement('button');
+    b.className = 'item-btn' + (arr.includes(it.id) ? ' selected' : '');
+    b.innerHTML = `<span class="emoji">${it.emoji}</span>${it.name}`;
+    b.onclick = () => {
+      const idx = arr.indexOf(it.id);
+      if(idx>-1) arr.splice(idx,1); else arr.push(it.id);
+      render(containerId, arr);
+      update();
+    };
+    c.appendChild(b);
+  });
+}
+
+function update(){
+  const y = calcTotal(yourTrade);
+  const t = calcTotal(theirTrade);
+  document.getElementById('yourTotal').textContent = y;
+  document.getElementById('theirTotal').textContent = t;
+  const fill = document.getElementById('meterFill');
+  const text = document.getElementById('fairnessText');
+  if(y===0 && t===0){
+    fill.style.width='50%';
+    fill.style.background='linear-gradient(90deg,#6366f1,#a855f7)';
+    text.textContent='Bekleniyor...';
+    text.style.color='#a5b4fc';
+    return;
+  }
+  const total = y+t;
+  fill.style.width = (total>0 ? (y/total)*100 : 50) + '%';
+  const diff = Math.abs(y-t);
+  const max = Math.max(y,t);
+  const pct = max>0 ? (diff/max)*100 : 0;
+  if(pct<5){
+    fill.style.background='linear-gradient(90deg,#22c55e,#4ade80)';
+    text.textContent='✅ Adil Takas';
+    text.style.color='#4ade80';
+  } else if(pct<20){
+    fill.style.background='linear-gradient(90deg,#eab308,#facc15)';
+    text.textContent='⚠️ Neredeyse Adil';
+    text.style.color='#facc15';
+  } else {
+    fill.style.background='linear-gradient(90deg,#dc2626,#f87171)';
+    text.textContent='❌ Adil Değil';
+    text.style.color='#f87171';
+  }
+}
+
+document.getElementById('clearBtn').onclick = () => {
+  yourTrade = [];
+  theirTrade = [];
+  render('yourItems', yourTrade);
+  render('theirItems', theirTrade);
+  update();
+};
+
+render('yourItems', yourTrade);
+render('theirItems', theirTrade);
+update();
+</script>
+</body>
+</html>
